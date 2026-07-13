@@ -12,6 +12,8 @@ import threading
 import time
 import sys
 import os
+import socket
+import webbrowser
 from urllib.parse import urlparse
 
 # ============ CONFIGURATION ============
@@ -273,7 +275,6 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
 
 
 def find_free_port(start=8888):
-    import socket
     for port in range(start, start + 100):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
@@ -298,6 +299,16 @@ if __name__ == "__main__":
     print("   Press Ctrl+C to stop")
     print("=" * 58)
     print()
+
+    # Auto-open browser after a brief delay
+    def _open_browser():
+        time.sleep(1.5)
+        try:
+            webbrowser.open(f"http://localhost:{port}")
+        except Exception:
+            pass
+    threading.Thread(target=_open_browser, daemon=True).start()
+
     try:
         server.serve_forever()
     except KeyboardInterrupt:
